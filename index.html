@@ -2,12 +2,153 @@
 <div id="container"></div>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script type="module">
-
-<script>
   console.log(d3); // test if d3 is loaded
-  // Add an SVG
-  // Add Rectangles
-  // Add Circles
-  // Add Lines
-  // Add Polygons
+  d3.select("#container")
+    .append("svg")
+    .attr("width", 500)
+    .attr("height", 500)
+    .style("border", "1px solid black")
+    .attr("id", "unique-svg-1");
+
+  d3.select("#container")
+    .append("svg")
+    .attr("width", 500)
+    .attr("height", 500)
+    .style("border", "1px solid black")
+    .style("background-color", "grey")
+    .attr("id", "unique-svg-2");
+  
+    // Eye-tangles
+  d3.select("#unique-svg-1")
+    .append("rect")
+    .attr("x", 70)
+    .attr("y", 90)
+    .attr("width", 100)
+    .attr("height", 100)
+    .attr("fill", "steelblue");
+
+  d3.select("#unique-svg-1")
+  .append("rect")
+  .attr("x", 330)
+  .attr("y", 90)
+  .attr("width", 100)
+  .attr("height", 200)
+  .attr("fill", "steelblue");
+
+  // Mouth
+  d3.select("#unique-svg-1")
+    .append("circle")
+    .attr("cx", 200)
+    .attr("cy", 400)
+    .attr("r", 50)
+    .attr("fill", "green");
+  
+  // Eyebrows
+  d3.select("#unique-svg-1")
+    .append("line")
+    .attr("x1", 40)
+    .attr("y1", 40)
+    .attr("x2", 180)
+    .attr("y2", 50)
+    .attr("stroke", "red")
+    .attr("stroke-width", 2);
+
+  d3.select("#unique-svg-1")
+    .append("line")
+    .attr("x1", 440)
+    .attr("y1", 50)
+    .attr("x2", 290)
+    .attr("y2", 40)
+    .attr("stroke", "red")
+    .attr("stroke-width", 2);
+  
+  // Nose
+  d3.select("#unique-svg-1")
+    .append("polygon")
+    .attr("points", "230,100 280,280 190,300")
+    .attr("fill", "orange");
+
+  // Function to make star shape
+  // Loops through the shape spikes * 2 times (outer and inner points), then connects the points
+  function drawStar(cx, cy, spikes, outerRadius, innerRadius) {
+    let path = "";
+    const angle = Math.PI / spikes;
+    for (let i = 0; i < spikes * 2; i++) {
+      const rad = i % 2 === 0 ? outerRadius : innerRadius;
+      const x = cx + rad * Math.sin(i * angle);
+      const y = cy - rad * Math.cos(i * angle);
+      path += (i === 0 ? "M" : "L") + x + "," + y; // This line was written with AI to explain d3 path construction
+    }
+
+    path += "Z"; // closes path - learned M moves to start w/o drawing, L draws lines to a point
+    return path;
+  }
+
+  for (let i = 0; i < 5; i++) {
+    d3.select("#unique-svg-2")
+      .append("path")
+      .attr("d", drawStar(60 + i * 80, i + 100, i % 2 ? 6 : 7, i % 2 ? 20 : 10, i % 2 ? 10 : 5))
+      .attr("fill", "yellow");
+  }
+
+  for (let i = 0; i < 5; i++) {
+    d3.select("#unique-svg-2")
+      .append("path")
+      .attr("d", drawStar(80 + i * 80, i + 150, i % 2 ? 6 : 7, i % 2 ? 20 : 10, i % 2 ? 10 : 5))
+      .attr("fill", "yellow");
+  }
+
+  for (let i = 0; i < 5; i++) {
+    d3.select("#unique-svg-2")
+      .append("path")
+      .attr("d", drawStar(60 + i * 80, i + 200, i % 2 ? 6 : 7, i % 2 ? 20 : 10, i % 2 ? 10 : 5))
+      .attr("fill", "yellow");
+  }
+
+  d3.select("#unique-svg-2")
+    .append("circle")
+    .attr("cx", 500)
+    .attr("cy", 0)
+    .attr("r", 100)
+    .attr("fill", "black");
+
+  d3.select("#unique-svg-2")
+    .append("curve")
+    .attr("d", "M0,250 Q250,100 500,250 T1000,250")
+    .attr("stroke", "white")
+    .attr("stroke-width", 2)
+    .attr("fill", "none");
+
+  const line = d3.line()
+    .x(d => d.x)
+    .y(d => d.y)
+    .curve(d3.curveBumpX);
+
+  const area = d3.area()
+    .x(d => d.x)
+    .y0(500)
+    .y1(d => d.y)
+    .curve(d3.curveBumpX);
+
+  const data = [
+    {x: 0, y: 300},
+    {x: 100, y: 400},
+    {x: 200, y: 415},
+    {x: 300, y: 350},
+    {x: 400, y: 320},
+    {x: 500, y: 300}
+  ];
+
+  d3.select("#unique-svg-2")
+    .append("path")
+    .attr("d", line(data))
+    .attr("stroke", "green")
+    .attr("stroke-width", 4)
+    .attr("fill", "none");
+
+  d3.select("#unique-svg-2")
+    .append("path")
+    .attr("d", area(data))
+    .attr("fill", "lightgreen")
+    .attr("opacity", 0.5);
 </script>
