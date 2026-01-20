@@ -1,6 +1,10 @@
 Assignment 1 - Hello World: GitHub and d3  
 ===
 
+Ben's Github Pages Link for SUBMISSION -> https://bpsupernova.github.io/a1/
+
+
+
 This is a starting project to make sure you can write and host a webpage that generates graphics using d3. 
 
 The primary goal is to be able to generate graphics primitives (circles, rectangles, lines, polygons) at different locations on the screen with different colors. 
