@@ -2,6 +2,8 @@
 <div id="container"></div>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script type="module">
+
+  // Abstract face with geometric features to test d3 & retain web dev skills 
   console.log(d3); // test if d3 is loaded
   d3.select("#container")
     .append("svg")
@@ -68,6 +70,10 @@
     .attr("points", "230,100 280,280 190,300")
     .attr("fill", "orange");
 
+  //------------------------------------------------------------------------------------
+
+  // #region Night sky with comet
+
   // Function to make star shape
   // Loops through the shape spikes * 2 times (outer and inner points), then connects the points
   function drawStar(cx, cy, spikes, outerRadius, innerRadius) {
@@ -84,6 +90,7 @@
     return path;
   }
 
+  // First row of stars
   for (let i = 0; i < 5; i++) {
     d3.select("#unique-svg-2")
       .append("path")
@@ -91,6 +98,7 @@
       .attr("fill", "yellow");
   }
 
+  // Second row of stars
   for (let i = 0; i < 5; i++) {
     d3.select("#unique-svg-2")
       .append("path")
@@ -98,6 +106,7 @@
       .attr("fill", "yellow");
   }
 
+  // Third row of stars
   for (let i = 0; i < 5; i++) {
     d3.select("#unique-svg-2")
       .append("path")
@@ -105,6 +114,7 @@
       .attr("fill", "yellow");
   }
 
+  // Moon
   d3.select("#unique-svg-2")
     .append("circle")
     .attr("cx", 500)
@@ -112,6 +122,7 @@
     .attr("r", 100)
     .attr("fill", "black");
 
+  // Hill curve
   d3.select("#unique-svg-2")
     .append("curve")
     .attr("d", "M0,250 Q250,100 500,250 T1000,250")
@@ -119,6 +130,7 @@
     .attr("stroke-width", 2)
     .attr("fill", "none");
 
+  // Area and line generators with bump curve to get that wavy hill look
   const line = d3.line()
     .x(d => d.x)
     .y(d => d.y)
@@ -130,7 +142,7 @@
     .y1(d => d.y)
     .curve(d3.curveBumpX);
 
-  const data = [
+  const hillPoints = [
     {x: 0, y: 300},
     {x: 100, y: 400},
     {x: 200, y: 415},
@@ -141,14 +153,154 @@
 
   d3.select("#unique-svg-2")
     .append("path")
-    .attr("d", line(data))
+    .attr("d", line(hillPoints))
     .attr("stroke", "green")
     .attr("stroke-width", 4)
     .attr("fill", "none");
 
   d3.select("#unique-svg-2")
     .append("path")
-    .attr("d", area(data))
+    .attr("d", area(hillPoints))
     .attr("fill", "lightgreen")
     .attr("opacity", 0.5);
+
+  // Making a supah sick comet - define gradients first
+  // Linear gradient
+  d3.select("#unique-svg-2")
+    .append("defs")
+    .append("linearGradient")
+    .attr("id", "trailGradient")
+    .attr("x1", "0%")
+    .attr("y1", "0%")
+    .attr("x2", "100%")
+    .attr("y2", "100%")
+    .selectAll("stop")
+    .data([
+      {offset: "0%", color: "green"},
+      {offset: "100%", color: "yellow"}
+    ])
+    .enter()
+    .append("stop")
+    .attr("offset", d => d.offset)
+    .attr("stop-color", d => d.color);
+
+  // Radial gradient
+  d3.select("#unique-svg-2")
+    .select("defs")
+    .append("radialGradient")
+    .attr("id", "cometGradient")
+    .selectAll("stop")
+    .data([
+      {offset: "0%", color: "turquoise"},
+      {offset: "100%", color: "blue"}
+    ])
+    .enter()
+    .append("stop")
+    .attr("offset", d => d.offset)
+    .attr("stop-color", d => d.color);
+
+  // Applying linear gradients to comet trail
+  for (let i = 0; i < 5; i++) {
+    d3.select("#unique-svg-2")
+      .append("path")
+      .attr("d", `M${150 + i},${150 + i} L300,50`)
+      .attr("stroke", "url(#trailGradient)")
+      .attr("stroke-width", 2)
+      .lower();
+  }
+
+  // Applying radial gradient to comet head
+  d3.select("#unique-svg-2")
+    .append("path")
+    .attr("d", drawStar(300, 50, 10, 25, 12))
+    .attr("fill", "url(#cometGradient)");
+
+// ------------------------------------------------------------------------------------
+
+// Bar graph comparing shapes used in each svg
+// Went through a large chunk of the d3 examples and API to form this chart
+// Only the scaleBands/scales were copied and tweaked from a bar chart example 
+
+function countingShapes(svgId) {
+  return {
+    rect: d3.select(svgId).selectAll("rect").size(),
+    circle: d3.select(svgId).selectAll("circle").size(),
+    polygon: d3.select(svgId).selectAll("polygon").size(),
+    line: d3.select(svgId).selectAll("line").size(),
+    path: d3.select(svgId).selectAll("path").size()
+  };
+}
+
+const svg1Counts = countingShapes("#unique-svg-1");
+const svg2Counts = countingShapes("#unique-svg-2");
+
+const barData = [
+  {shape: "rect", svg1: svg1Counts.rect, svg2: svg2Counts.rect},
+  {shape: "circle", svg1: svg1Counts.circle, svg2: svg2Counts.circle},
+  {shape: "polygon", svg1: svg1Counts.polygon, svg2: svg2Counts.polygon},
+  {shape: "line", svg1: svg1Counts.line, svg2: svg2Counts.line},
+  {shape: "path", svg1: svg1Counts.path, svg2: svg2Counts.path}
+];
+
+const width = 500;
+const height = 300;
+const margin = {top: 40, right: 20, bottom: 40, left: 50};
+
+const chartSvg = d3.select("#container")
+  .append("svg")
+  .attr("width", width)
+  .attr("height", height)
+  .style("border", "1px solid black");
+
+const x0 = d3.scaleBand()
+  .domain(barData.map(d => d.shape))
+  .range([margin.left, width - margin.right])
+  .padding(0.2);
+
+const x1 = d3.scaleBand()
+  .domain(["svg1", "svg2"])
+  .range([0, x0.bandwidth()])
+  .padding(0.1);
+
+const y = d3.scaleLinear()
+  .domain([0, d3.max(barData, d => Math.max(d.svg1, d.svg2))])
+  .nice()
+  .range([height - margin.bottom, margin.top]);
+
+// Draw the bars :)
+const groupings = chartSvg.selectAll("g.bar-group")
+  .data(barData)
+  .enter()
+  .append("g")
+  .attr("class", "bar-group")
+  .attr("transform", d => `translate(${x0(d.shape)},0)`);
+
+groupings.selectAll("rect")
+  .data(d => [
+    {key: "svg1", value: d.svg1},
+    {key: "svg2", value: d.svg2}
+  ])
+  .enter()
+  .append("rect")
+  .attr("x", d => x1(d.key))
+  .attr("y", d => y(d.value))
+  .attr("width", x1.bandwidth())
+  .attr("height", d => y(0) - y(d.value))
+  .attr("fill", d => d.key === "svg1" ? "steelblue" : "orange");
+
+  // Intialize the axes
+  chartSvg.append("g")
+    .attr("transform", `translate(0,${height - margin.bottom})`)
+    .call(d3.axisBottom(x0));
+
+  chartSvg.append("g")
+    .attr("transform", `translate(${margin.left},0)`)
+    .call(d3.axisLeft(y));
+
+  chartSvg.append("text")
+    .attr("x", width / 2)
+    .attr("y", 25)
+    .attr("text-anchor", "middle")
+    .attr("font-weight", "bold")
+    .text("SVG Shape Count Comparison");
 </script>
